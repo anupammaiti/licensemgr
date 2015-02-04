@@ -2,9 +2,9 @@ package com.qycloud.oatos.license.web;
 
 import com.qycloud.oatos.license.domain.Lic;
 import com.qycloud.oatos.license.domain.User;
-import com.qycloud.oatos.license.service.LicRepository;
-import com.qycloud.oatos.license.service.UserRepository;
-import com.qycloud.oatos.license.utils.License;
+import com.qycloud.oatos.license.dao.LicRepository;
+import com.qycloud.oatos.license.dao.UserRepository;
+import com.qycloud.oatos.license.service.UserService;
 import com.qycloud.oatos.license.utils.LicenseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,8 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.nio.file.Path;
 
 /**
  * Created by jiuyuehe on 2015/1/16.
@@ -28,39 +26,55 @@ public class HomeController {
     @Autowired
     private LicRepository licenseRepository;
 
+    @Autowired
+    private UserService userService;
+
+
     @RequestMapping("/")
     @ResponseBody
     public String helloWorld() {
         return "hello world license home";
     }
+
     //=============user services==============
     @RequestMapping(value = "/api/login", method = RequestMethod.POST)
     @ResponseBody
     public String login(@RequestBody User user) {
-        System.out.println(user.getEmail());
-        User getUser = this.userRepository.findByEmailAndPassword(user.getEmail(), user.getPassword());
-        if (getUser != null) {
-            return "ok";
+        String re = userService.login(user.getEmail(), user.getPassword());
+
+        if (re == null) {
+            return "errorAccountOrPwd";
+
+        } else {
+            return re;
         }
-        return "errorAccountOrPwd";
+
     }
 
+//    @RequestMapping(value = "/api/sc/user/{userId}", method = RequestMethod.GET)
+//    @ResponseBody
+//    public String getUserInfo(@PathVariable String userId) {
+//        System.out.println("userId : " + userId);
+//        User u = userRepository.findOne(Long.valueOf(userId));
+//        return u.getName();
+//    }
 
-    @RequestMapping(value = "/api/user/{userId}", method = RequestMethod.GET)
+    //==============================license dao==============
+
+    @RequestMapping(value = "/api/sc/lic/search/", method = RequestMethod.GET)
     @ResponseBody
-    public String getUserInfo(@PathVariable String userId) {
-        System.out.println("userId : " + userId);
-        User u = userRepository.findOne(Long.valueOf(userId));
-        return u.getName();
+    public Page<Lic> searchLic(@RequestParam(value = "keyWord", required = true) String keyWord,
+                               @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                               @RequestParam(value = "size", required = false, defaultValue = "2") int size
+    ) {
+        System.out.println("search  lic ======================" + keyWord);
+        Page<Lic> license = licenseRepository.findByLicToContaining(keyWord, new PageRequest(page, size));
+        return license;
     }
 
-
-    //==============================license service==============
-
-    @RequestMapping(value = "/api/lics", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/sc/lics", method = RequestMethod.POST)
     @ResponseBody
     public Lic addLicense(@RequestBody Lic lic) {
-
         System.out.println("POST  lic ======================" + lic);
 
         User u = userRepository.findOne(Long.valueOf(2));
@@ -77,7 +91,7 @@ public class HomeController {
 
     @RequestMapping(value = "/api/lics/{licId}", method = RequestMethod.POST)
     @ResponseBody
-    public Lic addLicense(@RequestBody Lic lic, @PathVariable Long licId) {
+    public Lic updateLicense(@RequestBody Lic lic, @PathVariable Long licId) {
 
         System.out.println("POST  lic ======================" + lic);
 
@@ -107,11 +121,9 @@ public class HomeController {
      */
     @RequestMapping(value = "/api/lics", method = RequestMethod.GET)
     @ResponseBody
-    public Page<Lic> getLicensesByPage(@RequestParam(value = "page", required = false, defaultValue = "0") int page, @RequestParam(value = "size", required = false, defaultValue = "2") int size) {
-
-
+    public Page<Lic> getLicensesByPage(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                       @RequestParam(value = "size", required = false, defaultValue = "2") int size) {
         Page<Lic> pageLicense = licenseRepository.findAll(new PageRequest(page, size, new Sort(Sort.Direction.DESC, "id")));
-
         return pageLicense;
     }
 

@@ -186,7 +186,7 @@ public class Security {
 	/**
 	 * 生成用户的令牌
 	 * 
-	 * @param userKey
+	 * @param userId
 	 * @return
 	 */
 	public static String CreateToken(String userId) {

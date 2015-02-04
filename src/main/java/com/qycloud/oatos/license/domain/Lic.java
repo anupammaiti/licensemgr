@@ -155,7 +155,6 @@ public class Lic implements Serializable {
                 ", expiry='" + expiry + '\'' +
                 ", signature='" + signature + '\'' +
                 ", connect='" + connect + '\'' +
-                ", user=" + user +
                 '}';
     }
 }

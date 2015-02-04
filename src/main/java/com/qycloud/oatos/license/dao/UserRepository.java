@@ -1,4 +1,4 @@
-package com.qycloud.oatos.license.service;
+package com.qycloud.oatos.license.dao;
 
 import com.qycloud.oatos.license.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
