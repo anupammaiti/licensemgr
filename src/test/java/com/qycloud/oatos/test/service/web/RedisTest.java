@@ -7,6 +7,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -23,7 +27,21 @@ import java.util.concurrent.TimeUnit;
 public class RedisTest {
 
     @Autowired
-    private RedisTemplate<String, User> template;
+    private StringRedisTemplate template;
+
+
+    @Test
+    public void test1(){
+        this.template.opsForValue().set("one","7777");
+        this.template.execute(new RedisCallback() {
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                ((StringRedisConnection)connection).set("two", "888");
+                return null;
+            }
+        });
+    }
+
 
     @Test
     public void testSetValue() {
@@ -35,15 +53,15 @@ public class RedisTest {
         u.setName("oooo");
         u.setId(233l);
         String key1 = "spring.boot.redis.user1";
-        ValueOperations<String, User> ops = this.template.opsForValue();
+        ValueOperations<String, String> ops = this.template.opsForValue();
+        ops.set(key1,u.toString());
+        ops.set(LicSecurity.encryptBASE64(key1.getBytes()),u.toString());
 
-        if (!this.template.hasKey(key1)) {
-            ops.set(key1, u);
-        }
+        System.out.println("expire is :" + this.template.expire(key1, 1000, TimeUnit.SECONDS));
+
+        System.out.println("expire is :" + this.template.getExpire(key1));
+
         System.out.println("Found key " + key1 + ", value=" + ops.get(key1));
-        System.out.println("expire is :" + this.template.getExpire(key1));
-        System.out.println("expire is :" + this.template.expire(key1, 5, TimeUnit.SECONDS));
-        System.out.println("expire is :" + this.template.getExpire(key1));
 
 
     }

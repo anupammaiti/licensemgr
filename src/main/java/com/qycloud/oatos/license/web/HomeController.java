@@ -40,15 +40,17 @@ public class HomeController {
     @RequestMapping(value = "/api/login", method = RequestMethod.POST)
     @ResponseBody
     public String login(@RequestBody User user) {
-        String re = userService.login(user.getEmail(), user.getPassword());
-
-        if (re == null) {
-            return "errorAccountOrPwd";
-
-        } else {
-            return re;
+        System.out.println(user);
+        try {
+            String re = userService.login(user.getEmail().trim(), user.getPassword().trim());
+            if (re == null) {
+                return "errorAccountOrPwd";
+            } else {
+                return re.trim();
+            }
+        }catch (Exception e){
+            return "error500";
         }
-
     }
 
 //    @RequestMapping(value = "/api/sc/user/{userId}", method = RequestMethod.GET)
@@ -89,7 +91,7 @@ public class HomeController {
         return license;
     }
 
-    @RequestMapping(value = "/api/lics/{licId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/sc/lics/{licId}", method = RequestMethod.POST)
     @ResponseBody
     public Lic updateLicense(@RequestBody Lic lic, @PathVariable Long licId) {
 
@@ -119,7 +121,7 @@ public class HomeController {
      * @param size
      * @return
      */
-    @RequestMapping(value = "/api/lics", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/sc/lics", method = RequestMethod.GET)
     @ResponseBody
     public Page<Lic> getLicensesByPage(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                        @RequestParam(value = "size", required = false, defaultValue = "2") int size) {
@@ -128,7 +130,7 @@ public class HomeController {
     }
 
 
-    @RequestMapping(value = "/api/lics/{licId}")
+    @RequestMapping(value = "/api/sc/lics/{licId}")
     @ResponseBody
     public Lic getLicenseInfo(@PathVariable String licId) {
 

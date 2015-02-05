@@ -7,7 +7,7 @@ import com.qycloud.oatos.license.domain.User;
  */
 public interface UserService {
 
-    String  login(String email,String password);
+    String  login(String email,String password) throws Exception;
 
     User getUserInfo(long id);
 

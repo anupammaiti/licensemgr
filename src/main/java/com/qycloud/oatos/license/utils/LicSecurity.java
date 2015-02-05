@@ -10,21 +10,35 @@ public class LicSecurity {
 
     /**
      * BASE64解密
+     *
      * @param key
      * @return
      * @throws Exception
      */
-    public static byte[] decryptBASE64(String key) throws Exception {
-        return (new BASE64Decoder()).decodeBuffer(key);
+    public static byte[] decryptBASE64(String key)   {
+        byte[] by =null;
+        try{
+          by =  (new BASE64Decoder()).decodeBuffer(key);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return by;
     }
 
     /**
      * BASE64加密
+     *
      * @param key
      * @return
      * @throws Exception
      */
-    public static String encryptBASE64(byte[] key) throws Exception {
-        return (new BASE64Encoder()).encodeBuffer(key);
+    public static String encryptBASE64(byte[] key)  {
+        String str =null;
+        try {
+           str =  (new BASE64Encoder()).encodeBuffer(key);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return str;
     }
 }
