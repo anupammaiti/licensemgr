@@ -7,6 +7,8 @@
     <groupId>com.qycloud</groupId>
     <artifactId>oatos_pm</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
 
     <properties>
         <java.version>1.8</java.version>
@@ -72,7 +74,6 @@
         </dependency>
 
 
-
     </dependencies>
 
     <!-- Package as an executable jar -->
@@ -81,6 +82,8 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                
+
             </plugin>
         </plugins>
     </build>

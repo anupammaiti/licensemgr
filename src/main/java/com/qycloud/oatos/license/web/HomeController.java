@@ -4,14 +4,25 @@ import com.qycloud.oatos.license.domain.Lic;
 import com.qycloud.oatos.license.domain.User;
 import com.qycloud.oatos.license.dao.LicRepository;
 import com.qycloud.oatos.license.dao.UserRepository;
+import com.qycloud.oatos.license.service.LicService;
+import com.qycloud.oatos.license.service.LicServiceImpl;
 import com.qycloud.oatos.license.service.UserService;
 import com.qycloud.oatos.license.utils.LicenseUtil;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.File;
 
 /**
  * Created by jiuyuehe on 2015/1/16.
@@ -29,6 +40,8 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private LicService licService;
 
     @RequestMapping("/")
     @ResponseBody
@@ -48,7 +61,7 @@ public class HomeController {
             } else {
                 return re.trim();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return "error500";
         }
     }
@@ -61,7 +74,7 @@ public class HomeController {
 //        return u.getName();
 //    }
 
-    //==============================license dao==============
+    //==============================license service==============
 
     @RequestMapping(value = "/api/sc/lic/search/", method = RequestMethod.GET)
     @ResponseBody
@@ -73,6 +86,23 @@ public class HomeController {
         Page<Lic> license = licenseRepository.findByLicToContaining(keyWord, new PageRequest(page, size));
         return license;
     }
+
+    @RequestMapping(value = "/api/lic/download/{licId}", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<byte[]> downloadLic(@PathVariable long licId,
+                                              @RequestParam(value = "ut", required = true)String ut) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "oatos.lic");
+            return new ResponseEntity<byte[]>(FileUtil.readAsByteArray(this.licService.downloadLic(licId)),
+                    headers, HttpStatus.CREATED);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
 
     @RequestMapping(value = "/api/sc/lics", method = RequestMethod.POST)
     @ResponseBody
